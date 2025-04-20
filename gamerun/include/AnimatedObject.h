@@ -7,7 +7,7 @@ public:
         int frameW, int frameH, int frameCount, int frameTime);
     void update();
     void render();
-
+    void setRect(const SDL_Rect& newRect);
 private:
     int frameWidth;
     int frameHeight;

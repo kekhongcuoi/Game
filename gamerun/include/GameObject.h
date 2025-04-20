@@ -9,6 +9,7 @@ public:
     SDL_Rect getRect();
     void setX(int x);
     void moveX(int dx);
+
 protected:
     SDL_Texture* texture;
     SDL_Renderer* renderer;

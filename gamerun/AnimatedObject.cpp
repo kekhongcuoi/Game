@@ -20,3 +20,6 @@ void AnimatedObject::render() {
     SDL_Rect srcRect = { currentFrame * frameWidth, 0, frameWidth, frameHeight };
     SDL_RenderCopy(renderer, texture, &srcRect, &rect);
 }
+void AnimatedObject::setRect(const SDL_Rect& newRect) {
+    this->rect = newRect;
+}

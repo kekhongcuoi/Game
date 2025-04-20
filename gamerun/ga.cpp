@@ -33,11 +33,18 @@ void Ga::update() {
         lastFrameTime = currentTime;
     }
 }
-
 void Ga::render() {
     SDL_Rect srcRect = { currentFrame * frameWidth, 0, frameWidth, frameHeight };
     SDL_RenderCopy(renderer, texture, &srcRect, &rect);
 }
 SDL_Rect Ga::getRect() {
     return rect;
+}
+void Ga::setTexture(SDL_Texture* newTexture) {
+    texture = newTexture;
+}
+void Ga::reset() {
+    rect.y = GROUND_Y - 60;
+    yVelocity = 0;
+    isJumping = false;
 }

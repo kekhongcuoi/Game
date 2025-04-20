@@ -7,11 +7,14 @@
 #include <ctime>
 #include <string>
 #include <vector>
-#include <cmath> // Thêm để sử dụng sin
-#include "include/GameObject.h"
+#include "include/GameObject.h" 
 #include "include/Ga.h"
 #include "include/AnimatedObject.h"
 #include "include/cloud.h"
+#include <SDL_mixer.h>
+#include"include/Menu.h"
+#include "include/TextUtils.h"
+
 
 using namespace std;
 
@@ -31,41 +34,24 @@ int randomInRange(int min, int max) {
     return rand() % (max - min + 1) + min;
 }
 
-SDL_Texture* loadTexture(SDL_Renderer* renderer, const char* path) {
-    SDL_Surface* surface = IMG_Load(path);
-    if (!surface) {
-        std::cerr << "Error loading image: " << IMG_GetError() << std::endl;
-        return nullptr;
-    }
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
-    return texture;
-}
-
-SDL_Texture* renderText(SDL_Renderer* renderer, TTF_Font* font, const std::string& message, SDL_Color color) {
-    SDL_Surface* surface = TTF_RenderText_Solid(font, message.c_str(), color);
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
-    return texture;
-}
-
-
 int main(int argc, char* argv[]) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         std::cerr << "SDL_Init Error: " << SDL_GetError() << std::endl;
         return 1;
     }
-
+    
     if (TTF_Init() != 0) {
         std::cerr << "TTF_Init Error: " << TTF_GetError() << std::endl;
         return 1;
     }
-
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+      std::cerr << "SDL_mixer could not initialize! SDL_mixer Error: " << Mix_GetError() << std::endl;
+      return 1;
+  }
     if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG) {
         std::cerr << "IMG_Init Error: " << IMG_GetError() << std::endl;
         return 1;
     }
-
     srand(static_cast<unsigned int>(time(0)));
 
     SDL_Window* window = SDL_CreateWindow("Ga Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -78,6 +64,18 @@ int main(int argc, char* argv[]) {
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (!renderer) {
         std::cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
+        return 1;
+    }
+    Mix_Chunk* jumpSound = Mix_LoadWAV("assets/music/jump.wav");
+    Mix_Chunk* hitSound = Mix_LoadWAV("assets/music/hit.wav");
+    Mix_Music* bgMusic = Mix_LoadMUS("assets/music/bg.wav");
+    Mix_PlayMusic(bgMusic, -1);// lặp vô hạn cho âm thanh nền
+    if (!bgMusic) {
+        std::cerr << "Failed to load background music! SDL_mixer Error: " << Mix_GetError() << std::endl;
+        return 1;  // Dừng chương trình nếu không thể tải nhạc nền
+    }
+    if (!jumpSound || !hitSound) {
+        std::cerr << "Failed to load sound effects! " << Mix_GetError() << std::endl;
         return 1;
     }
     TTF_Font* font = TTF_OpenFont("assets/fonts/WinkyRough-Light.ttf", 24); // Đảm bảo có font trong thư mục assets
@@ -96,7 +94,7 @@ int main(int argc, char* argv[]) {
         int x = randomInRange(0, SCREEN_WIDTH);
         int y = randomInRange(50, 200);
         int speed = randomInRange(-2, -1);
-        clouds.push_back(Cloud(cloudTex, renderer, { x, y, 400, 150 }, speed));
+        clouds.push_back(Cloud(cloudTex, renderer, { x, y, 300, 150 }, speed));
     }
 
     int groundX = 0;
@@ -105,6 +103,18 @@ int main(int argc, char* argv[]) {
     SDL_Texture* groundTex = loadTexture(renderer, "assets/images/dat.png");
     SDL_Texture* gaTex = loadTexture(renderer, "assets/images/gachay.png");
     SDL_Texture* cactusTex = loadTexture(renderer, "assets/images/fire.png");
+    SDL_Texture* gaNuongTex = loadTexture(renderer, "assets/images/ganuong.png");
+    Mix_Music* menuMusic = Mix_LoadMUS("assets/sounds/music.mp3");
+    SDL_Texture* menuBg = loadTexture(renderer, "assets/images/moon.png");
+
+    int menuChoice = showMenu(renderer, font, menuBg, menuMusic);
+    if (menuChoice == 1) {
+        // bắt đầu chơi
+    }
+    else if (menuChoice == 2) {
+        // thoát
+        return 0;
+    }
  
     Ga ga(gaTex, renderer, { 50, GROUND_Y - 60, 60, 60 });
     AnimatedObject cactus(cactusTex, renderer, { SCREEN_WIDTH, GROUND_Y - 40, 60, 60 },
@@ -113,6 +123,7 @@ int main(int argc, char* argv[]) {
     GameObject ground(groundTex, renderer, { 0, GROUND_Y, SCREEN_WIDTH, 80 });
 
     bool running = true;
+    
     SDL_Event e;
     int score = 0;
     SDL_Color textColor = { 0, 0, 0, 255 }; // màu đen
@@ -123,6 +134,7 @@ int main(int argc, char* argv[]) {
             }
             if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_SPACE) {
                 ga.jump();
+                Mix_PlayChannel(-1, jumpSound, 0);
             }
         }
         SDL_RenderClear(renderer);
@@ -138,7 +150,7 @@ int main(int argc, char* argv[]) {
             SDL_RenderCopy(renderer, backgrounds[nextBgIndex], nullptr, nullptr);
             SDL_SetTextureAlphaMod(backgrounds[nextBgIndex], 255);
             SDL_SetTextureBlendMode(backgrounds[nextBgIndex], SDL_BLENDMODE_NONE);
-            fadeAlpha += 5;
+            fadeAlpha += 3;
             if (fadeAlpha >= 255) {
                 fadeAlpha = 255;
                 bgIndex = nextBgIndex;
@@ -167,11 +179,85 @@ int main(int argc, char* argv[]) {
             }
         }
         SDL_Rect gaRect = ga.getRect();
+
         SDL_Rect cactusRect = cactus.getRect();
         if (SDL_HasIntersection(&gaRect, &cactusRect)) {
+            // Phát âm thanh khi va chạm
+            Mix_PlayChannel(-1, hitSound, 0);
+            Mix_PauseMusic();
             std::cout << "Game Over! Score: " << score << std::endl;
-            running = false;
+            SDL_Delay(500);
+            running = false;  // Kết thúc game sau khi va chạm
         }
+
+        if (SDL_HasIntersection(&gaRect, &cactusRect)) {
+            std::cout << "Game Over! Score: " << score << std::endl;
+            ga.setTexture(gaNuongTex); // Gà nướng
+
+            // Tọa độ con gà nướng phía trên lửa
+            SDL_Rect gaNuongRect = { SCREEN_WIDTH / 2 - 50, GROUND_Y - 100, 90, 90 };
+            SDL_Rect fireRect = { SCREEN_WIDTH / 2 - 25, GROUND_Y - 30, 50, 50 };
+            bool waiting = true;
+            SDL_Event event;
+
+            while (waiting) {
+                while (SDL_PollEvent(&event)) {
+                    if (event.type == SDL_QUIT) {
+                        waiting = false;
+                        running = false;
+                    }
+                    if (event.type == SDL_MOUSEBUTTONDOWN) {
+                        int mx = event.button.x;
+                        int my = event.button.y;
+                        if (mx >= gaNuongRect.x && mx <= gaNuongRect.x + gaNuongRect.w &&
+                            my >= gaNuongRect.y && my <= gaNuongRect.y + gaNuongRect.h) {
+                            // Reset game
+                            score = 0;
+                            speedrun = 1.0f;
+                            ga.setTexture(gaTex); // Gà thường
+                            cactus.setX(SCREEN_WIDTH);
+                            ga.reset(); // nếu có
+                            isFading = false;
+                            bgIndex = 0;
+                            fadeAlpha = 0;
+                            nextBgIndex = 0;
+                            waiting = false;
+                            running = true;
+                        }
+                    }
+                }
+
+                // Vẽ nền, đất, gà nướng, lửa
+                SDL_RenderClear(renderer);
+                SDL_RenderCopy(renderer, backgrounds[bgIndex], nullptr, nullptr);
+
+                SDL_Rect groundRect1 = { 0, GROUND_Y, SCREEN_WIDTH, 80 };
+                SDL_RenderCopy(renderer, groundTex, nullptr, &groundRect1);
+                for (Cloud& cloud : clouds) {
+                    cloud.move();
+                    cloud.render();
+                }
+
+                cactus.setRect(fireRect);
+                cactus.update();
+                cactus.render();
+                SDL_RenderCopy(renderer, gaNuongTex, nullptr, &gaNuongRect); // gà nướng
+
+                // Vẽ chữ “Nhấn vào gà để chơi lại”
+                SDL_Color color = { 255, 0, 0, 255 };
+                
+                SDL_Texture* retryText = renderText(renderer, font, "", color);
+                int tw, th;
+                SDL_QueryTexture(retryText, nullptr, nullptr, &tw, &th);
+                SDL_Rect textRect = { SCREEN_WIDTH / 2 - 10, GROUND_Y - 70, 30, 30 };
+                SDL_RenderCopy(renderer, retryText, nullptr, &textRect);
+                SDL_DestroyTexture(retryText);
+
+                SDL_RenderPresent(renderer);
+                SDL_Delay(16);
+            }
+        }
+
 
         for (Cloud& cloud : clouds) {
             cloud.move();
@@ -215,5 +301,10 @@ int main(int argc, char* argv[]) {
     TTF_CloseFont(font);
     TTF_Quit();
     SDL_Quit();
+    SDL_DestroyTexture(gaNuongTex);
+    Mix_FreeChunk(jumpSound);
+    Mix_FreeChunk(hitSound);
+    Mix_CloseAudio();
+
     return 0;
 }

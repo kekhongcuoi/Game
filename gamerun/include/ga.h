@@ -12,6 +12,8 @@ public:
     void update();
     void render();
     SDL_Rect getRect();
+    void setTexture(SDL_Texture* newTexture);
+    void reset();
 
 private:
     

@@ -33,7 +33,10 @@
     <ClCompile Include="cloud.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Fire.cpp">
+    <ClCompile Include="Menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -61,10 +64,10 @@
     <ClInclude Include="include\cloud.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Fire.h">
+    <ClInclude Include="include\Menu.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\GameManager.h">
+    <ClInclude Include="include\TextUtils.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
