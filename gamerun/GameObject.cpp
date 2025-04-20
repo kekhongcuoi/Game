@@ -1,11 +1,13 @@
-#include "GameObject.h"
+﻿#include "GameObject.h"
 
-GameObject::GameObject(SDL_Texture* tex, SDL_Renderer* rend, SDL_Rect r)
-    : texture(tex), renderer(rend), rect(r) {
+GameObject::GameObject(SDL_Texture* texture, SDL_Renderer* renderer, SDL_Rect rect)
+    : texture(texture), renderer(renderer), rect(rect) {
 }
 
 void GameObject::render() {
+    
     SDL_RenderCopy(renderer, texture, nullptr, &rect);
+    SDL_SetTextureAlphaMod(texture, 255); // Đặt lại alpha để không ảnh hưởng đối tượng khác
 }
 
 SDL_Rect GameObject::getRect() {
@@ -19,3 +21,4 @@ void GameObject::setX(int x) {
 void GameObject::moveX(int dx) {
     rect.x += dx;
 }
+

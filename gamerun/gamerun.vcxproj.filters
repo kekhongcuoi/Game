@@ -27,24 +27,24 @@
     <ClCompile Include="GameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AnimatedObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cloud.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Fire.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="assets\images\ga.bmp">
-      <Filter>assets</Filter>
-    </Image>
-    <Image Include="assets\images\vatcan.bmp">
-      <Filter>assets</Filter>
-    </Image>
-    <Image Include="assets\images\bg.bmp">
-      <Filter>assets</Filter>
-    </Image>
     <Image Include="assets\images\dat.bmp">
       <Filter>assets</Filter>
     </Image>
-    <Image Include="assets\images\gachy.bmp">
+    <Image Include="assets\images\fire.bmp">
       <Filter>assets</Filter>
     </Image>
-    <Image Include="assets\images\fire.bmp">
+    <Image Include="assets\images\bg1.png">
       <Filter>assets</Filter>
     </Image>
   </ItemGroup>
@@ -53,6 +53,18 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\GameObject.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnimatedObject.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\cloud.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Fire.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameManager.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

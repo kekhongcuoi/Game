@@ -139,20 +139,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AnimatedObject.cpp" />
+    <ClCompile Include="cloud.cpp" />
+    <ClCompile Include="Fire.cpp" />
     <ClCompile Include="ga.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="assets\images\bg.bmp" />
     <Image Include="assets\images\dat.bmp" />
     <Image Include="assets\images\fire.bmp" />
-    <Image Include="assets\images\ga.bmp" />
-    <Image Include="assets\images\gachy.bmp" />
-    <Image Include="assets\images\vatcan.bmp" />
+    <Image Include="assets\images\bg1.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\AnimatedObject.h" />
+    <ClInclude Include="include\cloud.h" />
+    <ClInclude Include="include\Fire.h" />
     <ClInclude Include="include\ga.h" />
+    <ClInclude Include="include\GameManager.h" />
     <ClInclude Include="include\GameObject.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

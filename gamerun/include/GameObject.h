@@ -1,8 +1,5 @@
-
+﻿
 #pragma once
-#ifndef GAMEOBJECT_H
-#define GAMEOBJECT_H
-
 #include <SDL.h>
 
 class GameObject {
@@ -12,11 +9,8 @@ public:
     SDL_Rect getRect();
     void setX(int x);
     void moveX(int dx);
-
 protected:
     SDL_Texture* texture;
     SDL_Renderer* renderer;
     SDL_Rect rect;
 };
-
-#endif
